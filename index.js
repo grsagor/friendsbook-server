@@ -30,13 +30,20 @@ async function run(){
 
         /* Getting Post */
         app.get('/posts', async (req,res) => {
-            const query = {};
+            let query = {};
+
+            if(req.query.id){
+                query = {
+                    _id: ObjectId(req.query.id)
+                }
+            };
+
             const posts = await postsCollection.find(query).sort({_id:-1}).toArray();
             res.send(posts);
         })
         app.get('/postsinhome', async (req,res) => {
             const query = {};
-            const posts = await postsCollection.find(query).sort({reactCount:-1}).toArray();
+            const posts = await postsCollection.find(query).sort({reactCount:-1}).limit(3).toArray();
             res.send(posts);
         })
 
