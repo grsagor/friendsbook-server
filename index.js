@@ -16,6 +16,7 @@ const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology:
 async function run(){
     try{
         const postsCollection = client.db('friendsbook').collection('posts');
+        const usersCollection = client.db('friendsbook').collection('users');
 
         app.get('/', (req,res) => {
             res.send('Friendsbook is running');
@@ -49,6 +50,45 @@ async function run(){
 
         /* Like Update */
         app.put('/like', async(req, res)=> {
+            const body = req.body;
+            const options = {upsert: true};
+            const id = body.id;
+            const filter = {_id: ObjectId(id)};
+            const updateDoc ={
+                $set:{
+                    reactor: body.reactor,
+                    reactCount: body.reactCount
+                }
+            }
+            const result = await postsCollection.updateOne(filter, updateDoc, options);
+            res.send(result);
+
+        })
+
+        // app.post('/comments', async (req, res) => {
+        //     const body = req.body;
+        //     const result = await postsCollection.insertOne(body);
+        //     res.send(result);
+        // });
+
+        /* Comments Adding */
+        app.put('/comments', async(req, res)=> {
+            const body = req.body;
+            const options = {upsert: true};
+            const id = body.id;
+            const filter = {_id: ObjectId(id)};
+            const updateDoc ={
+                $set: {
+                    currentComments: body.currentComments
+                }
+            }
+            const result = await postsCollection.updateOne(filter, updateDoc, options);
+            res.send(result);
+
+        })
+
+        /* Users */
+        app.put('/users', async(req, res)=> {
             const body = req.body;
             const options = {upsert: true};
             const id = body.id;
