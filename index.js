@@ -88,21 +88,25 @@ async function run(){
         })
 
         /* Users */
-        app.put('/users', async(req, res)=> {
+        app.post('/users', async (req, res) => {
             const body = req.body;
-            const options = {upsert: true};
-            const id = body.id;
-            const filter = {_id: ObjectId(id)};
-            const updateDoc ={
-                $set:{
-                    reactor: body.reactor,
-                    reactCount: body.reactCount
-                }
-            }
-            const result = await postsCollection.updateOne(filter, updateDoc, options);
+            const result = await usersCollection.insertOne(body);
             res.send(result);
+        });
 
+        app.get('/users', async (req,res) => {
+            let query = {};
+
+            if(req.query.email){
+                query = {
+                    email: req.query.email
+                }
+            };
+
+            const posts = await usersCollection.find(query).sort({_id:-1}).toArray();
+            res.send(posts);
         })
+
     }
     finally{
 
